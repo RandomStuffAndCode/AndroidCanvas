@@ -19,7 +19,7 @@ import android.os.Bundle;
 import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
-
+    private final static int CORNER_RADIUS = 50;
     private View mView;
 
     @Override
@@ -32,21 +32,12 @@ public class MainActivity extends AppCompatActivity {
         init();
     }
 
-    private final static int CORNER_RADIUS = 50;
-
     private void init() {
         Context context = this;
 
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inMutable = true;
-        Bitmap src = BitmapFactory.decodeResource(getResources(), R.drawable.my_background, options);
-
+        Bitmap src = createBackgroundBitmap();
         Canvas canvas = new Canvas(src);
-
-        Bitmap gradientBitmap = createGradientBitmap(context, src.getHeight(), src.getWidth());
-        Paint gradientPaint = new Paint();
-        gradientPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.OVERLAY));
-        canvas.drawBitmap(gradientBitmap, 0,0, gradientPaint);
+        prepareGradient(context, canvas, src.getWidth(), src.getHeight());
 
         RoundedBitmapDrawable dr = RoundedBitmapDrawableFactory.create(getResources(), src);
         dr.setCornerRadius(convertToPixels(context, CORNER_RADIUS));
@@ -57,6 +48,19 @@ public class MainActivity extends AppCompatActivity {
         canvas.drawBitmap(drBitmap, 0,0,drPaint);
 
         mView.setBackground(new BitmapDrawable(getResources(), src));
+    }
+
+    private void prepareGradient(Context context, Canvas canvas, int width, int height) {
+        Bitmap gradientBitmap = createGradientBitmap(context, height, width);
+        Paint gradientPaint = new Paint();
+        gradientPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.OVERLAY));
+        canvas.drawBitmap(gradientBitmap, 0,0, gradientPaint);
+    }
+
+    private Bitmap createBackgroundBitmap() {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inMutable = true;
+        return BitmapFactory.decodeResource(getResources(), R.drawable.my_background, options);
     }
 
     public static Bitmap drawableToBitmap (Drawable drawable) {
